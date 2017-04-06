@@ -129,7 +129,7 @@
           default: 
             description: "unexpected error"
             schema: 
-              $ref: 'ErrorModel.yaml'
+              $ref: "ErrorModel.yaml"
   definitions: 
     Pet: 
       type: "object"
