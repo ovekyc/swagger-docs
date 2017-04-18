@@ -184,8 +184,8 @@
       }
     }
   },
-  "parameters":[
-    {
+  "parameters":{ 
+    "keps" : {
       "name": "skip",
       "in": "query",
       "description": "number of items to skip",
@@ -193,7 +193,7 @@
       "type": "integer",
       "format": "int32"
     },
-    {
+    "linmit" : {
       "name": "limit",
       "in": "query",
       "description": "max records to return",
@@ -201,7 +201,7 @@
       "type": "integer",
       "format": "int32"
     },
-    {
+    "body" : {
       "name": "user",
       "in": "body",
       "description": "user to add to the system",
@@ -210,7 +210,7 @@
         "$ref": "#/definitions/Pet"
       }
     },
-    {
+    "string_arr" : {
       "name": "user_arr",
       "in": "body",
       "description": "user to add to the system",
@@ -222,7 +222,7 @@
         }
       }
     },
-    {
+    "kint64" : {
       "name": "token_int64",
       "in": "header",
       "description": "token to be passed as a header",
@@ -234,14 +234,14 @@
       },
       "collectionFormat": "csv"
     },
-    {
+    "string" : {
       "name": "username_string",
       "in": "path",
       "description": "username to fetch",
       "required": true,
       "type": "string"
     },
-    {
+    "opt_string" : {
       "name": "id_string_opt",
       "in": "query",
       "description": "ID of the object to fetch",
@@ -252,14 +252,14 @@
       },
       "collectionFormat": "multi"
     },
-    {
+    "form" : {
       "name": "avatar_form",
       "in": "formData",
       "description": "The avatar of the user",
       "required": true,
       "type": "file"
     }
-  ],
+  },
   "security":
   {
     "petstore_auth": [
