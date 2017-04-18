@@ -184,8 +184,8 @@
       }
     }
   },
-  "parameters":{
-    "skipParam": {
+  "parameters":[
+    {
       "name": "skip",
       "in": "query",
       "description": "number of items to skip",
@@ -193,7 +193,7 @@
       "type": "integer",
       "format": "int32"
     },
-    "limitParam": {
+    {
       "name": "limit",
       "in": "query",
       "description": "max records to return",
@@ -201,7 +201,7 @@
       "type": "integer",
       "format": "int32"
     },
-    "ex1": {
+    {
       "name": "user",
       "in": "body",
       "description": "user to add to the system",
@@ -210,8 +210,8 @@
         "$ref": "#/definitions/Pet"
       }
     },
-    "ex_array": {
-      "name": "user",
+    {
+      "name": "user_arr",
       "in": "body",
       "description": "user to add to the system",
       "required": true,
@@ -222,8 +222,8 @@
         }
       }
     },
-    "ex_int64" :{
-      "name": "token",
+    {
+      "name": "token_int64",
       "in": "header",
       "description": "token to be passed as a header",
       "required": true,
@@ -234,15 +234,15 @@
       },
       "collectionFormat": "csv"
     },
-    "ex_string":{
-      "name": "username",
+    {
+      "name": "username_string",
       "in": "path",
       "description": "username to fetch",
       "required": true,
       "type": "string"
     },
-    "ex_string_opt" :{
-      "name": "id",
+    {
+      "name": "id_string_opt",
       "in": "query",
       "description": "ID of the object to fetch",
       "required": false,
@@ -252,14 +252,14 @@
       },
       "collectionFormat": "multi"
     },
-    "ex_form" : {
-      "name": "avatar",
+    {
+      "name": "avatar_form",
       "in": "formData",
       "description": "The avatar of the user",
       "required": true,
       "type": "file"
     }
-  },
+  ],
   "security":
   {
     "api_key": [],
