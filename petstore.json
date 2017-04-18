@@ -184,7 +184,83 @@
       }
     }
   },
-  "securityRequirement":
+  "parameters":{
+    "skipParam": {
+      "name": "skip",
+      "in": "query",
+      "description": "number of items to skip",
+      "required": true,
+      "type": "integer",
+      "format": "int32"
+    },
+    "limitParam": {
+      "name": "limit",
+      "in": "query",
+      "description": "max records to return",
+      "required": true,
+      "type": "integer",
+      "format": "int32"
+    },
+    "ex1": {
+      "name": "user",
+      "in": "body",
+      "description": "user to add to the system",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/Pet"
+      }
+    },
+    "ex_array": {
+      "name": "user",
+      "in": "body",
+      "description": "user to add to the system",
+      "required": true,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "ex_int64" :{
+      "name": "token",
+      "in": "header",
+      "description": "token to be passed as a header",
+      "required": true,
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "collectionFormat": "csv"
+    },
+    "ex_string":{
+      "name": "username",
+      "in": "path",
+      "description": "username to fetch",
+      "required": true,
+      "type": "string"
+    },
+    "ex_string_opt" :{
+      "name": "id",
+      "in": "query",
+      "description": "ID of the object to fetch",
+      "required": false,
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "collectionFormat": "multi"
+    },
+    "ex_form" : {
+      "name": "avatar",
+      "in": "formData",
+      "description": "The avatar of the user",
+      "required": true,
+      "type": "file"
+    }
+  },
+  "security":
   {
     "api_key": [],
     "petstore_auth": [
