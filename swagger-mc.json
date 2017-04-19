@@ -1,0 +1,1413 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "API for Mission Control resources\n\nThis API will be implemented by IoT GW and exposed to MC for consumption.",
+    "version" : "1.0.0",
+    "title" : "Mission Control",
+    "contact" : { }
+  },
+  "host" : "somewhere.com",
+  "tags" : [ {
+    "name" : "Accounts and Users",
+    "description" : "Items related to accounts and users"
+  }, {
+    "name" : "Devices and SIMs",
+    "description" : "Resources for managing and interacting with devices and SIMs\n\nA device is anthing that can receive services provided through any service provider."
+  }, {
+    "name" : "Representations",
+    "description" : "JSON Representations of elements used in the Mission Control API."
+  }, {
+    "name" : "Primatives",
+    "description" : "Primative objects used to make up requests and responses in the Misson Control API"
+  } ],
+  "schemes" : [ "https" ],
+  "security" : [ {
+    "Basic authentication" : [ ]
+  }, {
+    "Oauth 2.0 Authentication" : [ ]
+  } ],
+  "paths" : {
+    "/accountgroup" : {
+      "get" : {
+        "tags" : [ "Accounts and Users" ],
+        "summary" : "Get accounts groups for self",
+        "description" : "Gets a listing of all the account groups assocaited with the requesting identity.",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "A list of the account groups associated with this user",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Account Group"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Returned if the user does not have permission to access this information."
+          }
+        }
+      }
+    },
+    "/accountgroup/{groupName]" : {
+      "get" : {
+        "tags" : [ "Accounts and Users" ],
+        "summary" : "Get single account group",
+        "description" : "Gets a single account group",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "The account group info associated with the groupName",
+            "schema" : {
+              "$ref" : "#/definitions/Account Group"
+            }
+          },
+          "401" : {
+            "description" : "Returned if the user does not have permission to view this account."
+          },
+          "404" : {
+            "description" : "Returned if the account group is not found"
+          }
+        }
+      }
+    },
+    "/accounts" : {
+      "get" : {
+        "tags" : [ "Accounts and Users" ],
+        "summary" : "Get account listing",
+        "description" : "Returns a listing of all account IDs associated with this identity. Account IDs will span multiple service providers\n",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns a list of account IDs associated with the identity making the request. If there are no accounts, an empty list will be returned.",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/account2serviceprovider"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Status 401"
+          }
+        }
+      }
+    },
+    "/accounts/{accountID}" : {
+      "get" : {
+        "tags" : [ "Accounts and Users" ],
+        "summary" : "Get account detailed information",
+        "description" : "Get the details of an individual account. Assumes that accountID is unique across service providers and that underlying gateway can determine to what service provider account is associated.",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "accountID",
+          "in" : "path",
+          "description" : "The ID of the account being accessed. This will correspond to the account ID in the target service provider's system.",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The details for the requested account are returned.",
+            "schema" : {
+              "$ref" : "#/definitions/Account"
+            }
+          },
+          "401" : {
+            "description" : "Status 401"
+          },
+          "404" : {
+            "description" : "The account ID specified was not found."
+          }
+        }
+      }
+    },
+    "/devices" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get devices associated with this user",
+        "description" : "This will return a list of all the devices manageable by this user.\n\n*This will need to be paginated in production*\n",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "A list of device IDs associated with this user.\n\nFor now, we're going to assume that this is sufficient to uniquely identify a device across service providers.",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Returned if user isn't authorized to get this info"
+          }
+        }
+      }
+    },
+    "/devices/{deviceid}" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get information about a given device",
+        "description" : "Uses the *deviceid* to get information about a particular device",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "deviceid",
+          "in" : "path",
+          "description" : "The device ID",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The information about the requested device",
+            "schema" : {
+              "$ref" : "#/definitions/Device"
+            }
+          },
+          "401" : {
+            "description" : "Returned if the user is not authorized to view the device info"
+          },
+          "404" : {
+            "description" : "Returned if the device is not found"
+          }
+        }
+      }
+    },
+    "/devices/{deviceid}/diagnostics" : { },
+    "/devices/{deviceid}/rtstatus" : { },
+    "/devices/{deviceid}/sessions" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get session details associated with a given device",
+        "description" : "Returns a list of session objects assocaited with the given device",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "deviceid",
+          "in" : "path",
+          "description" : "The device ID",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "List of current sessions associated with the device",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Session"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Returned if the user is now authorized to view device or session information."
+          },
+          "404" : {
+            "description" : "Returned if the device is not found"
+          }
+        }
+      }
+    },
+    "/devices/{deviceid}/usage/all" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get all the sets of usage data for this device",
+        "description" : "Returns all the sets of usage data for this device",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "deviceid",
+          "in" : "path",
+          "description" : "The device ID",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "All the usage information associated with this device",
+            "schema" : {
+              "$ref" : "#/definitions/Usage All"
+            }
+          },
+          "401" : {
+            "description" : "Returned if user is not authorized to get information for this device"
+          },
+          "404" : {
+            "description" : "Returned if this device is not found"
+          }
+        }
+      }
+    },
+    "/devices/{deviceid}/usage/data" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get data usage",
+        "description" : "Get the data usage associated with this device",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "deviceid",
+          "in" : "path",
+          "description" : "The device ID",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Data usage for this device",
+            "schema" : {
+              "$ref" : "#/definitions/Usage Data"
+            }
+          },
+          "401" : {
+            "description" : "Returned if user is not authorized to access this device"
+          },
+          "404" : {
+            "description" : "Returned if this device is not found"
+          }
+        }
+      }
+    },
+    "/devices/{deviceid}/usage/sms" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get sms usage",
+        "description" : "Gets the SMS usage for a device",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "deviceid",
+          "in" : "path",
+          "description" : "The device ID",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Gets SMS usage",
+            "schema" : {
+              "$ref" : "#/definitions/Usage SMS"
+            }
+          },
+          "401" : {
+            "description" : "Returned if user is not authorized to view this device"
+          },
+          "404" : {
+            "description" : "Returned if the device is not found"
+          }
+        }
+      }
+    },
+    "/devices/{deviceid}/usage/summary" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get a usage summary for this device",
+        "description" : "Returns a summary of the usage information associated with this device",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "deviceid",
+          "in" : "path",
+          "description" : "The device ID",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Summary of the device's usage data",
+            "schema" : {
+              "$ref" : "#/definitions/Usage Summary"
+            }
+          },
+          "401" : {
+            "description" : "Returned if user is not authorized to access this data"
+          },
+          "404" : {
+            "description" : "Returned if the device is not found"
+          }
+        }
+      }
+    },
+    "/devices/{deviceid}/usage/voice" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get voice usage",
+        "description" : "Returns the voice usage for this device",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "deviceid",
+          "in" : "path",
+          "description" : "The device ID",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The device's voice usage",
+            "schema" : {
+              "$ref" : "#/definitions/Usage Voice"
+            }
+          },
+          "401" : {
+            "description" : "Returned if user is not authorized to access this usage"
+          },
+          "404" : {
+            "description" : "Returned if the device is not found"
+          }
+        }
+      }
+    },
+    "/sims" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get a listing of all SIMs",
+        "description" : "Returns a listing of all the SIMs accessible by this user",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "List of SIM ICCIDs",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Returned if user is not authorized to access this information"
+          }
+        }
+      }
+    },
+    "/sims/{iccid}" : {
+      "get" : {
+        "tags" : [ "Devices and SIMs" ],
+        "summary" : "Get the details of a single SIM",
+        "description" : "Returns the details of an individual SIM",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "iccid",
+          "in" : "path",
+          "description" : "The ICCID of the SIM",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "The details of the specified SIM",
+            "schema" : {
+              "$ref" : "#/definitions/SIM"
+            }
+          },
+          "401" : {
+            "description" : "Returned if user is not authorized to access this data"
+          },
+          "404" : {
+            "description" : "Returned if the specified ICCID is not found"
+          }
+        }
+      }
+    },
+    "/users" : {
+      "get" : {
+        "tags" : [ "Accounts and Users" ],
+        "summary" : "Get user info for self",
+        "description" : "The operation returns user information associated with the identity of the requester,",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns a list of the user data associated with each underlying service provider system.",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/User"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Returned if the requesting user is not allowed to view data."
+          },
+          "404" : {
+            "description" : "Returned if the requesting user is not found in the system."
+          }
+        }
+      }
+    },
+    "/users/{userID}" : {
+      "get" : {
+        "tags" : [ "Accounts and Users" ],
+        "summary" : "Get user info for another user",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "userID",
+          "in" : "path",
+          "description" : "The userID used to identify the requested user resource.",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns the details for the requested user. The will consist of a list of information associated with this identity on each relevant underlying service provider platform.",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/User"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Returned if the user is not authorized to access this resource."
+          },
+          "404" : {
+            "description" : "Returned if the userID associated with the request is not found"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "Basic authentication" : {
+      "description" : "Basic authentication may be used for select special accounts that need to directly access resources in the implementing gateway. In this case associating access controls with identity is under the control of the implementing platform.\n\nConnections over this API must use HTTPS",
+      "type" : "basic"
+    },
+    "Oauth 2.0 Authentication" : {
+      "description" : "The primary method for authentication for this API will require the use of an OAuth 2.0 bearer token. In this case an access_token parameter will be presented during API calls.\n\nThe implementing gateway will rely on an external Identity and access management solution to \n1. Determine the validity of the token\n2. Determine the identity of the user associated with the token\n3. Determine the scope of the access rights granted through the token\n\nConnections over this API must use HTTPS",
+      "type" : "oauth2",
+      "scopes" : { }
+    }
+  },
+  "definitions" : {
+    "Account" : {
+      "type" : "object",
+      "required" : [ "mcAccountID", "serviceProvider" ],
+      "properties" : {
+        "mcAccountID" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "The Mission Control ID for this account. This is a unique and permanent ID."
+        },
+        "serviceProvider" : {
+          "type" : "string",
+          "description" : "Name of the service provider from which this Account resource comes."
+        },
+        "accountID" : {
+          "type" : "string",
+          "description" : "The account ID within the service provider's system"
+        },
+        "accountName" : {
+          "type" : "string",
+          "description" : "The account name within the service provider's system"
+        },
+        "status" : {
+          "type" : "string",
+          "description" : "The current status of a Mission Control account. Values are: \n- ACTIVE\n- INACTIVE\n- DELETED"
+        },
+        "taxID" : {
+          "type" : "string",
+          "description" : "Tax identification code or VAT for this account"
+        },
+        "currency" : {
+          "type" : "string",
+          "description" : "Currency used by this account"
+        },
+        "defaultRatePlan" : {
+          "type" : "string",
+          "description" : "Name of the account's default rate plan"
+        },
+        "defaultCommPlan" : {
+          "type" : "string",
+          "description" : "Name of the account's default communications plan"
+        },
+        "primaryContact" : {
+          "description" : "The primary contact for this account",
+          "$ref" : "#/definitions/contactInfo"
+        },
+        "billable" : {
+          "type" : "boolean",
+          "description" : "Boolean indicating if this account's usage is billable",
+          "default" : false
+        },
+        "accountType" : {
+          "type" : "string",
+          "description" : "Indicates if this account is production or test. Valid values are: \n- PROD\n- TEST\n- DEMO"
+        },
+        "locServicesType" : {
+          "type" : "string",
+          "description" : "*Do we need this field* ?\n\nPossible values are:\n- AYCE\n- PAYG\n- NONE"
+        },
+        "billingContact" : {
+          "description" : "Contact info for billing",
+          "$ref" : "#/definitions/contactInfo"
+        },
+        "shippingAddress" : {
+          "description" : "Address to which items are shipped",
+          "$ref" : "#/definitions/address"
+        },
+        "billingCycleStart" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "Day of the month on which the billing cycle starts"
+        },
+        "subAccounts" : {
+          "type" : "array",
+          "description" : "List of  sub-accounts underneath this account.",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "User" : {
+      "type" : "object",
+      "required" : [ "externalUserID", "internalUserID", "role", "serviceProvider", "spUserID" ],
+      "properties" : {
+        "externalUserID" : {
+          "type" : "string",
+          "description" : "External facing user ID. The user can change this if necessary."
+        },
+        "internalUserID" : {
+          "type" : "string",
+          "description" : "Internal ID for this user. Once assigned, this value does not change."
+        },
+        "spUserID" : {
+          "type" : "string",
+          "description" : "The ID associated with this user at the service provider level. Users will have a single external and internal ID that are associated with Mission Control and IoT GW and those IDs will potentially correlate to IDs on multiple underlying service provider systems."
+        },
+        "serviceProvider" : {
+          "type" : "string",
+          "description" : "The name of the service provider associated with this user resource."
+        },
+        "accounts" : {
+          "type" : "array",
+          "description" : "List of account IDs to which this user belongs within the service provider.",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "accountGroups" : {
+          "type" : "array",
+          "description" : "List of account group IDs to which this user belongs",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "role" : {
+          "type" : "string",
+          "description" : "The user's assigned role"
+        },
+        "contactInfo" : {
+          "description" : "Contact information for the user.",
+          "$ref" : "#/definitions/contactInfo"
+        },
+        "lastLogin" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Time and date of the user's last login"
+        },
+        "timezone" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "User's time offset from UTC expressed as an integer"
+        },
+        "status" : {
+          "type" : "string",
+          "description" : "Status of user's account. Values are:\n- UNLOCKED\n- LOCKED\n- DELETED\n\nWhat's missing in this one?"
+        },
+        "liveUpdates" : {
+          "type" : "boolean",
+          "description" : "Boolean indicating of this user is allowed to receive live updates. If true, they are.",
+          "default" : false
+        },
+        "locked" : {
+          "type" : "boolean",
+          "description" : "Boolean indicating if this account is currently locked.\n\nIs this necessary? Redundant with status.",
+          "default" : false
+        },
+        "lastReset" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time the last reset of this account occurred"
+        }
+      }
+    },
+    "Account Group" : {
+      "type" : "object",
+      "required" : [ "name", "serviceProvider" ],
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "description" : "Name of this account group"
+        },
+        "serviceProvider" : {
+          "type" : "string",
+          "description" : "The service provider with whom this account group is associated."
+        },
+        "desc" : {
+          "type" : "string",
+          "description" : "Description of this account group"
+        },
+        "accounts" : {
+          "type" : "array",
+          "description" : "List of  account IDs associated with this account group",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "users" : {
+          "type" : "array",
+          "description" : "List of  user IDs associated with this account group.",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      },
+      "description" : "An account group is a collection of Mission Control accounts. A user associated with an account group has the ability to perform the actions allowed by their role on all the associated accounts."
+    },
+    "Device" : {
+      "type" : "object",
+      "required" : [ "accounts", "deviceID" ],
+      "properties" : {
+        "deviceID" : {
+          "type" : "string",
+          "description" : "Unique ID for this device. Will map one or more underlying service providers depending upon connectivity.\n\n*Is this IMEI? Or something else?*"
+        },
+        "accounts" : {
+          "type" : "array",
+          "description" : "List of accounts and service providers to which this device belongs. Multi-mode devices may be associated with multiple providers",
+          "items" : {
+            "$ref" : "#/definitions/account2serviceprovider"
+          }
+        },
+        "modemID" : {
+          "type" : "array",
+          "description" : "List of modem IDs in this device",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "sims" : {
+          "type" : "array",
+          "description" : "List of SIM ICCIDs that are associated with this device. Some multi-mode devices will have multiple SIMs\n\n*Is ICCID ok to use here?*",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "ratePlan" : {
+          "type" : "string",
+          "description" : "The name of the rate plan associated with this device.\n\n*Should this be associated with a connection instead?*"
+        },
+        "status" : {
+          "type" : "string",
+          "description" : "Status of this device. Values are\n- NEW\n- ACTIVATED\n- DEACTIVATED\n- LOCKED\n- REMOVED\n\n*what's the right set of values here?*"
+        },
+        "dateAdded" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Time and date when this device was added to Mission Control/IoT GW"
+        },
+        "dateModified" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Time and date when this device was last modified"
+        },
+        "dateShipped" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date this device was shipped"
+        },
+        "sessions" : {
+          "type" : "array",
+          "description" : "List of active sessions associated with this device by session ID",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "usageLimitReached" : {
+          "type" : "boolean",
+          "description" : "Boolean indicating if the usage limit of this device based on its current rate plan has been reached",
+          "default" : false
+        },
+        "usageLimitOverride" : {
+          "type" : "string",
+          "description" : "Indicates the override behavior when usage limit has been reached. Values are:\n- NONE - no override (default)\n- TEMP - override for current billing cycle only\n- PERM - ongoing override"
+        },
+        "imei" : {
+          "type" : "string",
+          "description" : "Equipment identifier for this device"
+        },
+        "dateActivated" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time when this device was activated\n\n(Does this make sense in the context of a device, or just a SIM)"
+        },
+        "dateDeactivated" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time when this device was deactivated"
+        }
+      },
+      "description" : "Details about a device. A device is anything that connections to any kind of network supported by mission control. It may or may not have a SIM in it."
+    },
+    "Usage Summary" : {
+      "type" : "object",
+      "required" : [ "device" ],
+      "properties" : {
+        "serviceProvider" : {
+          "type" : "string",
+          "description" : "The service provider associated with this usage summary"
+        },
+        "device" : {
+          "type" : "string",
+          "description" : "The ID of the device associated with this usage information."
+        },
+        "sim" : {
+          "type" : "string",
+          "description" : "If applicable, the ICCID of the SIM associated with this usage"
+        },
+        "connectivityType" : {
+          "type" : "string",
+          "description" : "The type of connection used in this session. Values are\n- CELLULAR\n- SATELLITE\n- WIFI\n- FIXED\n- LPWA"
+        },
+        "billingCycle" : {
+          "type" : "string",
+          "description" : "The billing cycle for this usage represented by starting date"
+        },
+        "totalDataVolume" : {
+          "type" : "number",
+          "format" : "double",
+          "description" : "The total amount of data used within this period in MBs"
+        },
+        "billableDataVolume" : {
+          "type" : "number",
+          "format" : "double",
+          "description" : "The amount of billable data used within this period in MBs"
+        },
+        "totalSMSVolume" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "The total number of SMS messages sent in this period"
+        },
+        "billableSMSVolume" : {
+          "type" : "string",
+          "description" : "The billable number of SMS messages sent in this period"
+        },
+        "totalVoiceVolume" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "The total duration of voice calls during this period in seconds"
+        },
+        "billableVoiceVolume" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "The billable duration of voice calls during this period in seconds"
+        },
+        "eventsVolume" : {
+          "type" : "number",
+          "format" : "double",
+          "description" : "The amount of data used for events within the period in MBs"
+        },
+        "eventsCount" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "The number of events within the period"
+        },
+        "ratePlan" : {
+          "type" : "string",
+          "description" : "The rate plan associated with this usage"
+        }
+      },
+      "description" : "Represents a summary of the usage associated with a device and a connectivity type"
+    },
+    "Rate Plan" : {
+      "type" : "object"
+    },
+    "Role" : {
+      "type" : "object",
+      "required" : [ "permissions", "roleName" ],
+      "properties" : {
+        "roleName" : {
+          "type" : "string",
+          "description" : "The unique name of this role"
+        },
+        "permissions" : {
+          "type" : "array",
+          "description" : "List of the permissions that have been granted to this role",
+          "items" : {
+            "$ref" : "#/definitions/Permission"
+          }
+        }
+      },
+      "description" : "A role associated a unique name with a set of permissions to access resource in Misson Control"
+    },
+    "Session" : {
+      "type" : "object",
+      "required" : [ "device", "serviceProvider", "sessionID" ],
+      "properties" : {
+        "sessionID" : {
+          "type" : "string",
+          "description" : "Unique ID for this session"
+        },
+        "serviceProvider" : {
+          "type" : "string",
+          "description" : "The ID of the service provider associated with this session"
+        },
+        "device" : {
+          "type" : "string",
+          "description" : "The ID of the device associated with this session"
+        },
+        "sim" : {
+          "type" : "string",
+          "description" : "The ICCID of the SIM associated with this session (if applicable)"
+        },
+        "account" : {
+          "type" : "string",
+          "description" : "The ID of the account associated with this session"
+        },
+        "connectivityType" : {
+          "type" : "string",
+          "description" : "The type of connection used in this session. Values are\n- CELLULAR\n- SATELLITE\n- WIFI\n- FIXED\n- LPWA"
+        },
+        "serviceType" : {
+          "type" : "string",
+          "description" : "The service that is delivered during this session. Values are\n- DATA\n- VOICE\n- SMS\n- VIDEO\n- MMS"
+        },
+        "startTime" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "The start time of this session"
+        },
+        "location" : {
+          "type" : "string",
+          "description" : "The location of the device during this session\n\n*Need to determine the format*"
+        },
+        "ipAddress" : {
+          "type" : "string",
+          "description" : "The IP address of the session"
+        },
+        "gwAddress" : {
+          "type" : "string",
+          "description" : "The IP address for the GGSN/PGW"
+        },
+        "apn" : {
+          "type" : "string",
+          "description" : "The APN associated with this session"
+        },
+        "lastActivity" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "The time and date of the last activity on this session"
+        },
+        "locationDetail" : {
+          "description" : "Details for the location services in this session",
+          "$ref" : "#/definitions/Session Location"
+        },
+        "dataDetail" : {
+          "description" : "Details for the data services in this session",
+          "$ref" : "#/definitions/Session Data"
+        },
+        "smsDetail" : {
+          "description" : "Details for the sms services in this session",
+          "$ref" : "#/definitions/Session SMS"
+        }
+      },
+      "description" : "A session represents an active service between a device and a service provider."
+    },
+    "SIM" : {
+      "type" : "object",
+      "required" : [ "accountID", "iccid" ],
+      "properties" : {
+        "accountID" : {
+          "type" : "string",
+          "description" : "Account ID to which this SIM belongs"
+        },
+        "serviceProvider" : {
+          "type" : "string",
+          "description" : "The service provider associated with this SIM"
+        },
+        "iccid" : {
+          "type" : "string",
+          "description" : "The ICCID of the SIM"
+        },
+        "imsi" : {
+          "type" : "string",
+          "description" : "The IMSI of the SIM"
+        },
+        "imsi2" : {
+          "type" : "string",
+          "description" : "The IMSI2 of the SIM"
+        },
+        "imsi3" : {
+          "type" : "string",
+          "description" : "The IMSI3 of the SIM"
+        },
+        "imsi4" : {
+          "type" : "string",
+          "description" : "The IMSI4 of the SIM"
+        },
+        "status" : {
+          "type" : "string",
+          "description" : "The current status of the SIM: Valid values are:\n- TEST READY\n- INVENTORY\n- ACTIVATION READY\n- ACTIVATED\n- DEACTIVATED\n- RETIRED"
+        },
+        "session" : {
+          "type" : "string",
+          "description" : "ID of any current session associated with this SIM"
+        },
+        "activationDate" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date on which the SIM was activated"
+        },
+        "msisdn" : {
+          "type" : "string",
+          "description" : "The MSISDN assigned to this SIM"
+        },
+        "pin1" : {
+          "type" : "string",
+          "description" : "SIM PIN code 1"
+        },
+        "pin2" : {
+          "type" : "string",
+          "description" : "SIM PIN code 2"
+        },
+        "puk1" : {
+          "type" : "string",
+          "description" : "SIM PIN unlock code 1"
+        },
+        "puk2" : {
+          "type" : "string",
+          "description" : "SIM PIN unlock code 2"
+        },
+        "notes" : {
+          "type" : "string",
+          "description" : "Notes about this SIM"
+        },
+        "fixedIP" : {
+          "type" : "string",
+          "description" : "If applicable, the value of the SIM's fixed IP address"
+        },
+        "activeProfile" : {
+          "type" : "string",
+          "description" : "Name of currently active SIM profile"
+        },
+        "defaultProfile" : {
+          "type" : "string",
+          "description" : "Name of the SIM's default profile"
+        },
+        "profiles" : {
+          "type" : "array",
+          "description" : "List of the names of the profiles available for this SIM",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      },
+      "description" : "Represents information associated with a SIM."
+    },
+    "ServiceProviderAccount" : {
+      "type" : "object",
+      "required" : [ "spID" ],
+      "properties" : {
+        "spID" : {
+          "type" : "string",
+          "description" : "ID for the underlying service provider. Current possible values are:\nACC - AT&T Control Center\nGCM - Globecomm\nBDG - Bridge Alliance"
+        },
+        "spName" : {
+          "type" : "string",
+          "description" : "Descriptive name of the service provider"
+        },
+        "accountName" : {
+          "type" : "string",
+          "description" : "Account name associated with this provider"
+        },
+        "accountStatus" : {
+          "type" : "string",
+          "description" : "Status of underlying account. Values are active, inactive, deleted."
+        },
+        "mcAccount" : {
+          "type" : "string",
+          "description" : "The Mission Control account ID with which this information is associated."
+        }
+      },
+      "description" : "Representation of an account on a service provider's system"
+    },
+    "Invoice" : {
+      "type" : "object",
+      "description" : "Deferred until post MWC"
+    },
+    "Usage All" : {
+      "type" : "object",
+      "properties" : {
+        "summary" : {
+          "$ref" : "#/definitions/Usage Summary"
+        },
+        "data" : {
+          "$ref" : "#/definitions/Usage Data"
+        },
+        "voice" : {
+          "$ref" : "#/definitions/Usage Voice"
+        },
+        "sms" : {
+          "$ref" : "#/definitions/Usage SMS"
+        }
+      },
+      "description" : "Structure containing all usage representations"
+    },
+    "contactInfo" : {
+      "type" : "object",
+      "properties" : {
+        "firstName" : {
+          "type" : "string",
+          "description" : "Contact's first name"
+        },
+        "lastName" : {
+          "type" : "string",
+          "description" : "Contact's last name"
+        },
+        "address" : {
+          "description" : "The contact's address",
+          "$ref" : "#/definitions/address"
+        },
+        "email" : {
+          "type" : "string",
+          "description" : "Contact's email address"
+        },
+        "phone" : {
+          "description" : "Contact's phone number",
+          "$ref" : "#/definitions/Phone"
+        }
+      }
+    },
+    "address" : {
+      "type" : "object",
+      "properties" : {
+        "addressLine1" : {
+          "type" : "string",
+          "description" : "Line 1 of a street address"
+        },
+        "addressLine2" : {
+          "type" : "string",
+          "description" : "Line 2 of a street address"
+        },
+        "city" : {
+          "type" : "string",
+          "description" : "City name"
+        },
+        "region" : {
+          "type" : "string",
+          "description" : "Region"
+        },
+        "countryCode" : {
+          "type" : "string",
+          "description" : "Three letter country code as defined in ISO 3166-1 alpha-3"
+        },
+        "postalCode" : {
+          "type" : "string",
+          "description" : "Postal code for address"
+        }
+      },
+      "description" : "General structure to represent an address"
+    },
+    "requestHeader" : {
+      "type" : "object",
+      "properties" : {
+        "transactionID" : {
+          "type" : "string",
+          "description" : "A unique ID for this request. It is expected that all responses to this request include this request ID in a response header."
+        }
+      },
+      "description" : "This header is included in all operations sent to Mission Control. It contains information to allow identification of the device, service provider, account, etc. so that the underlying system can make an appropriate call to an underlying service provider platform."
+    },
+    "Phone" : {
+      "type" : "object",
+      "properties" : {
+        "countryCode" : {
+          "type" : "string",
+          "description" : "Country code"
+        },
+        "areaCode" : {
+          "type" : "string",
+          "description" : "Area code"
+        },
+        "localNumber" : {
+          "type" : "string",
+          "description" : "Local number"
+        }
+      },
+      "description" : "Structure representing a phone number"
+    },
+    "Permission" : {
+      "type" : "object",
+      "properties" : {
+        "resource" : {
+          "type" : "string",
+          "description" : "The resource on which the capability applies.Valid values are:\nsystem\naccount\nuser\naccountgroup\ndevice\nsim\nrateplan\ninvoice\nsession\nserviceprovider"
+        },
+        "capabilities" : {
+          "type" : "array",
+          "description" : "A list of capabilities allowed to be performed on this resource. Possible values are:\nread\ncreate\nupdate\ndelete",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      },
+      "description" : "A permission structure associated with the system and resouces in mission control"
+    },
+    "Session Location" : {
+      "type" : "object",
+      "properties" : {
+        "status" : {
+          "type" : "string",
+          "description" : "*Need to consult DCP docs for values here*"
+        },
+        "timestamp" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time of last update"
+        },
+        "vlrGT" : {
+          "type" : "string",
+          "description" : "VLR Global Title address"
+        },
+        "countryCode" : {
+          "type" : "string",
+          "description" : "Two-letter ountry code for last update"
+        },
+        "operatorCode" : {
+          "type" : "string",
+          "description" : "Mobile network operator providing location"
+        }
+      }
+    },
+    "Session Data" : {
+      "type" : "object",
+      "properties" : {
+        "pdpActive" : {
+          "type" : "boolean",
+          "description" : "Boolean indicating if the PDP context is active",
+          "default" : false
+        },
+        "activationTime" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time of session activation"
+        },
+        "ipAddress" : {
+          "type" : "string",
+          "description" : "IP address associated with the session"
+        },
+        "apn" : {
+          "type" : "string",
+          "description" : "APN associated with this session"
+        },
+        "txBytes" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Bytes transmitted in this session"
+        },
+        "lastTxTime" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time of last transmit"
+        },
+        "rxBytes" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Bytes received in this session"
+        },
+        "lastRxTime" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time of last receive"
+        },
+        "publicIPAddress" : {
+          "type" : "string",
+          "description" : "IP address of this session on the Internet"
+        }
+      }
+    },
+    "Session SMS" : {
+      "type" : "object",
+      "properties" : {
+        "mobileOriginated" : {
+          "description" : "Details of MO SMS messages",
+          "$ref" : "#/definitions/SMS Session Detail"
+        },
+        "mobileTerminated" : {
+          "description" : "Details of MT SMS messages",
+          "$ref" : "#/definitions/SMS Session Detail"
+        },
+        "moLastDest" : {
+          "type" : "string",
+          "description" : "MSISDN of the last destination"
+        },
+        "lastErrorTime" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Time and date of the last SMS error"
+        },
+        "lastErrorCode" : {
+          "type" : "string",
+          "description" : "Error code for the last SMS error"
+        }
+      }
+    },
+    "SMS Session Detail" : {
+      "type" : "object",
+      "properties" : {
+        "count" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "Count of SMSs"
+        },
+        "lastSMS" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time of last message"
+        },
+        "errorCount" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "Count of errors"
+        }
+      }
+    },
+    "Usage Header" : {
+      "type" : "object",
+      "properties" : {
+        "sim" : {
+          "type" : "string",
+          "description" : "If applicable, the ICCID of the SIM associated with this data"
+        },
+        "cycleStartDate" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "The starting date of the billing cycle in which this usage occurred"
+        },
+        "deviceID" : {
+          "type" : "string",
+          "description" : "The ID of the device that incurred this usage"
+        },
+        "billable" : {
+          "type" : "boolean",
+          "description" : "Boolean indicating if this usage is billable",
+          "default" : false
+        },
+        "zone" : {
+          "type" : "string",
+          "description" : "Zone in which the usage occurred"
+        },
+        "serviceProvider" : {
+          "type" : "string",
+          "description" : "Service provider associated with this usage data."
+        }
+      }
+    },
+    "Usage Data" : {
+      "type" : "object",
+      "required" : [ "header" ],
+      "properties" : {
+        "header" : {
+          "$ref" : "#/definitions/Usage Header"
+        },
+        "startTime" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "The start time for this period of usage"
+        },
+        "duration" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "The duration of this usage in seconds"
+        },
+        "dataVolume" : {
+          "type" : "string",
+          "description" : "Volume of data consumed in this session in KBs"
+        },
+        "countryCode" : {
+          "type" : "string",
+          "description" : "Country code where usage occurred"
+        },
+        "serviceType" : {
+          "type" : "string",
+          "description" : "Indicates if this data is associated with a service or an event. Values are\n- SERVICE\n- EVENT"
+        }
+      }
+    },
+    "Usage SMS" : {
+      "type" : "object",
+      "properties" : {
+        "header" : {
+          "$ref" : "#/definitions/Usage Header"
+        },
+        "dateSent" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time message sent"
+        },
+        "sentFrom" : {
+          "type" : "string",
+          "description" : "MSISDN from which the message was sent"
+        },
+        "sentTo" : {
+          "type" : "string",
+          "description" : "MSISDN to which the message is sent"
+        }
+      }
+    },
+    "Usage Voice" : {
+      "type" : "object",
+      "properties" : {
+        "header" : {
+          "$ref" : "#/definitions/Usage Header"
+        },
+        "callStartTime" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "Date and time when the call started"
+        },
+        "calledNumber" : {
+          "type" : "string",
+          "description" : "The telephone number that was called"
+        },
+        "duration" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "The duration of the call in seconds."
+        }
+      }
+    },
+    "Realtime Data" : {
+      "type" : "object",
+      "description" : "Data element returned as part of a realtime status request"
+    },
+    "responseHeader" : {
+      "type" : "object",
+      "properties" : {
+        "transactionID" : {
+          "type" : "string",
+          "description" : "The transaction ID that was provided when the request to which this response is being provided was sent."
+        },
+        "timestamp" : {
+          "type" : "string",
+          "format" : "date",
+          "description" : "The date and time at which the response was sent"
+        }
+      },
+      "description" : "This header is sent back in response messages."
+    },
+    "account2serviceprovider" : {
+      "type" : "object",
+      "required" : [ "accountID" ],
+      "properties" : {
+        "accountID" : {
+          "type" : "string",
+          "description" : "The account ID within the service provider's system"
+        },
+        "serviceProvider" : {
+          "type" : "string",
+          "description" : "The name of the service provider"
+        }
+      },
+      "description" : "Associates an account ID and a service provider."
+    }
+  }
+}
