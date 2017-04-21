@@ -130,6 +130,11 @@
         tag: 
           type: "string"
         pet:
+          $ref: "#/definitions/Sample"
+    Sample: 
+      type: "object"
+      properties: 
+        newpet:
           $ref: "#/definitions/NewPet"
     ErrorModel: 
       type: "object"
